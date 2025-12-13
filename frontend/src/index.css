@@ -1,0 +1,663 @@
+/*src/index.css*/
+/* ==========================================================================
+   1. VARIABLES & RESET (THEME CORE)
+   ========================================================================== */
+:root {
+  --bg: #0d1117;          /* Fondo Principal Oscuro */
+  --fg: #e6edf3;          /* Texto Principal */
+  --accent: #00e0ff;      /* Cian Neón (Admin/Primary) */
+  --accent2: #ff0080;     /* Magenta Neón (Secundario/Contador) */
+  --success: #00ff9d;     /* Verde Neón (Verificador) */
+  --card: #161b22;        /* Fondo Tarjetas/Sidebar */
+  --border: #30363d;      /* Bordes sutiles */
+  --hover: rgba(255, 255, 255, 0.05);
+  --shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  --sidebar-width: 260px; 
+  
+  --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   2. AUTH / LOGIN SCREENS
+   ========================================================================== */
+.login-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.login-card {
+  background: var(--card);
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.15);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  animation: fadeIn 0.8s ease;
+}
+
+.login-title { color: var(--fg); margin-top: 0; letter-spacing: 2px; }
+.login-subtitle { color: #8b949e; margin-bottom: 30px; }
+
+.role-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1rem;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.role-btn:hover {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+  transform: translateX(5px);
+}
+
+/* ==========================================================================
+   3. LAYOUT COMPONENT
+   ========================================================================== */
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+  flex-shrink: 0; /* Evita que se encoja */
+}
+
+.layout-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%; /* Asegura que ocupe el resto */
+  overflow: hidden; /* Evita scroll del body completo */
+}
+
+.layout-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  position: relative;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (SIDEBAR DRAWER)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* El Sidebar se convierte en un cajón flotante */
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%); /* Oculto por defecto a la izquierda */
+    box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+  }
+
+  /* Clase para abrir el Sidebar */
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay oscuro cuando el menú está abierto */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+    z-index: 40; /* Debajo del sidebar (50) */
+    opacity: 0;
+    animation: fadeIn 0.2s forwards;
+  }
+
+  /* Ajustes de padding en móvil */
+  .layout-content {
+    padding: 15px; /* Menos padding para ganar espacio */
+  }
+
+  .top-bar {
+    padding: 0 15px; /* Menos padding lateral */
+  }
+}
+
+/* ==========================================================================
+   4. SIDEBAR COMPONENT
+   ========================================================================== */
+.sidebar {
+  width: 260px;
+  background-color: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  height: 100%;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: 1.5px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  color: #8b949e;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-link:hover { color: var(--fg); background: var(--hover); }
+.nav-link.active {
+  background-color: rgba(0, 224, 255, 0.1);
+  color: var(--accent);
+  border-left: 3px solid var(--accent);
+}
+
+/* ==========================================================================
+   5. TOPBAR COMPONENT
+   ========================================================================== */
+.top-bar {
+  height: 70px;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 10;
+}
+
+.top-left { display: flex; align-items: center; gap: 15px; }
+.system-tag {
+  color: var(--accent2); 
+  font-size: 0.75rem; 
+  font-weight: bold;
+  text-transform: uppercase; 
+  letter-spacing: 2px;
+  border: 1px solid var(--accent2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.top-actions { display: flex; gap: 20px; align-items: center; }
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.icon-btn:hover { background: var(--hover); }
+
+.badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background-color: var(--accent2);
+  border-radius: 50%;
+}
+
+.user-profile {
+  display: flex; align-items: center; gap: 12px; 
+  margin-left: 15px; padding-left: 15px;
+  border-left: 1px solid var(--border);
+}
+
+.user-info { text-align: right; font-size: 0.85rem; }
+.user-name { font-weight: 600; color: var(--fg); }
+.user-status { color: var(--success); font-size: 0.75rem; }
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   6. HOME & DASHBOARDS
+   ========================================================================== */
+.home-container { display: flex; gap: 20px; height: 100%; }
+
+.home-left {
+  flex: 1;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 280px;
+  max-width: 350px;
+}
+
+.home-right { flex: 3; display: flex; flex-direction: column; }
+
+/* Tabs de Navegación */
+.admin-tabs {
+  display: flex; gap: 10px; margin-bottom: 20px;
+  border-bottom: 1px solid var(--border); padding-bottom: 10px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #8b949e;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { color: var(--fg); background: var(--hover); }
+.tab-btn.active {
+  background: rgba(0, 224, 255, 0.08);
+  border-color: rgba(0, 224, 255, 0.3);
+  color: var(--accent);
+}
+
+/* Paneles de Contenido */
+.dashboard-placeholder {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  flex: 1;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-placeholder h2 { margin-top: 15px; margin-bottom: 5px; }
+.panel-conteo { border-top: 4px solid var(--accent2); }
+.panel-verificacion { border-top: 4px solid var(--success); }
+
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+  width: 100%; max-width: 400px; margin-top: 30px;
+}
+.stat-card {
+  background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.stat-card h3 { margin: 0; font-size: 1.5rem; color: var(--accent); }
+
+.action-btn {
+  margin-top: 25px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+.btn-conteo { border-color: var(--accent2); color: var(--accent2); }
+.btn-conteo:hover { background: var(--accent2); color: #fff; }
+.btn-verif { border-color: var(--success); color: var(--success); }
+.btn-verif:hover { background: var(--success); color: #000; }
+
+/* ==========================================================================
+   7. USER MANAGEMENT
+   ========================================================================== */
+.panel-title {
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 15px; margin-top: 0;
+  color: var(--fg);
+}
+
+.user-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+
+.user-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px;
+  border-left: 3px solid var(--border);
+  transition: 0.2s;
+}
+.user-item:hover { background: var(--hover); border-left-color: var(--accent); }
+
+.u-name { font-weight: 500; }
+.u-role { font-size: 0.8rem; opacity: 0.7; }
+
+.add-user-btn {
+  margin-top: 20px; width: 100%; padding: 12px;
+  background: var(--accent2); border: none;
+  border-radius: 6px; color: white;
+  font-weight: bold; cursor: pointer;
+  display: flex; justify-content: center; gap: 8px; align-items: center;
+  transition: 0.3s;
+}
+.add-user-btn:hover { background: #d6006c; }
+
+/* ==========================================================================
+   8. PDA / SCANNER STYLES (NEW)
+   ========================================================================== */
+.pda-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 8px;
+    outline: none;
+    font-size: 1.1rem; /* Texto más grande para lectura fácil */
+    transition: border-color 0.2s;
+}
+.pda-input:focus {
+    border-color: var(--accent2);
+    background: rgba(255, 0, 128, 0.05);
+}
+
+.pda-input-large {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--fg);
+    border-radius: 10px;
+    outline: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.pda-input-large:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 10px rgba(255, 0, 128, 0.2);
+}
+
+.pda-btn-primary {
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex; justify-content: center; align-items: center; gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.1s;
+}
+.pda-btn-primary:active { transform: scale(0.98); }
+
+.pda-btn-secondary {
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex; justify-content: center; align-items: center; gap: 8px;
+    transition: background 0.2s;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ==========================================================================
+   9. TOAST NOTIFICATIONS (NUEVO SISTEMA)
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* Click through empty space */
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 300px;
+  max-width: 400px;
+  background: rgba(22, 27, 34, 0.95); /* var(--card) con transparencia */
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--fg);
+  font-size: 0.9rem;
+  
+  /* Animaciones */
+  animation: slideInRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transition: all 0.3s ease;
+  transform-origin: top right;
+}
+
+.toast.exit {
+  animation: fadeOutRight 0.3s forwards;
+}
+
+/* Variantes */
+.toast-success { border-color: var(--success); }
+.toast-success .icon { color: var(--success); }
+
+.toast-error { border-color: #ef4444; }
+.toast-error .icon { color: #ef4444; }
+
+.toast-warning { border-color: #f59e0b; }
+.toast-warning .icon { color: #f59e0b; }
+
+.toast-info { border-color: var(--accent); }
+.toast-info .icon { color: var(--accent); }
+
+/* Keyframes */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ==========================================================================
+   10. CONFIRMATION MODAL (System Override)
+   ========================================================================== */
+.confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10000; /* Por encima de todo, incluso toasts */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-card {
+  background: var(--card);
+  width: 90%;
+  max-width: 450px;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  transform: scale(0.95);
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.confirm-card.danger { border-color: #ef4444; }
+.confirm-card.warning { border-color: #f59e0b; }
+
+.confirm-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.confirm-header svg {
+  color: #ef4444;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4));
+}
+
+.confirm-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--fg);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.confirm-body {
+  text-align: center;
+  color: #8b949e;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  white-space: pre-line; /* Permite saltos de línea con \n */
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 15px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #8b949e;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { background: rgba(255,255,255,0.05); color: var(--fg); }
+
+.btn-confirm {
+  flex: 1;
+  padding: 15px;
+  background: #ef4444;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+  transition: all 0.2s;
+}
+.btn-confirm:hover { background: #dc2626; transform: translateY(-2px); }
+
+@keyframes popIn {
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   11. CUSTOM SCROLLBARS (WEBKIT) - GLOBAL
+   ========================================================================== */
+
+/* Barra total */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Fondo de la barra */
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* El deslizador (Thumb) */
+::-webkit-scrollbar-thumb {
+  background: #30363d; /* Color gris oscuro acorde al tema */
+  border-radius: 4px;
+  border: 2px solid rgba(0, 0, 0, 0.2); /* Borde para dar sensación de flotar */
+}
+
+/* Hover del deslizador */
+::-webkit-scrollbar-thumb:hover {
+  background: #8b949e;
+}
+
+/* Scrollbar invisible para contenedores específicos si se desea clase .no-scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
