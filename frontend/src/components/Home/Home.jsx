@@ -4,8 +4,8 @@ import { LayoutDashboard, Calculator, ShieldCheck } from "lucide-react";
 import AdminDashboard from "../Dashboard/AdminDashboard"; 
 import CounterDashboard from "../Dashboard/CounterDashboard"; 
 import VerifierDashboard from "../Dashboard/VerifierDashboard"; 
-import CountingSupervision from "../Supervision/CountingSupervision"; // <--- NUEVO
-import VerificationSupervision from "../Supervision/VerificationSupervision"; // <--- NUEVO
+import CountingSupervision from "../Supervision/CountingSupervision";
+import VerificationSupervision from "../Supervision/VerificationSupervision";
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Lock, Mail, Loader2, KeyRound, Activity, ShieldCheck } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({ correo: "", password: "" });
@@ -16,7 +17,7 @@ const Login = ({ onLogin }) => {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

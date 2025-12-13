@@ -1,9 +1,10 @@
 // frontend/src/context/ClientContext.jsx
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { API_URL } from "../config/api";
 
 const ClientContext = createContext(null);
 
-const API_URL = "http://localhost:3000/api/clientes"; 
+const URL = `${API_URL}/api/clientes`;
 
 export const ClientProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
@@ -14,7 +15,7 @@ export const ClientProvider = ({ children }) => {
   const refreshClients = async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(URL);
       if (!res.ok) throw new Error("Error de enlace con Cartera de Clientes");
       const data = await res.json();
       setClients(data.clients || []); 
@@ -34,7 +35,7 @@ export const ClientProvider = ({ children }) => {
   // 2. Crear Cliente (NUEVO)
   const addClient = async (clientData) => {
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(clientData),

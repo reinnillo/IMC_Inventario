@@ -8,6 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useClients } from "../../context/ClientContext";
 import { db, resetVerificationSession, resetClientDB } from "../../db/db";
 import { useToast } from "../../context/ToastContext"; 
+import { API_URL } from "../../config/api";
 
 const VerifierDashboard = () => {
   const { user } = useAuth();
@@ -181,7 +182,7 @@ const VerifierDashboard = () => {
             setDbLoading(true);
             try {
                 await resetClientDB(); 
-                const res = await fetch(`http://localhost:3000/api/inventario?cliente_id=${user.cliente_id || 1}`);
+                const res = await fetch(`${API_URL}/api/inventario?cliente_id=${user.cliente_id || 1}`);
                 const data = await res.json();
 
                 if (!res.ok) throw new Error(data.error);
@@ -221,7 +222,7 @@ const VerifierDashboard = () => {
       try { await resetVerificationSession(); } catch (e) {}
 
       const safeClientId = user.cliente_id || 1;
-      const response = await fetch(`http://localhost:3000/api/verificacion/marbete?marbete=${marbeteInput}&cliente_id=${safeClientId}`);
+      const response = await fetch(`${API_URL}/api/verificacion/marbete?marbete=${marbeteInput}&cliente_id=${safeClientId}`);
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || "Error al buscar marbete");
@@ -286,7 +287,7 @@ const VerifierDashboard = () => {
             };
 
             try {
-              const response = await fetch('http://localhost:3000/api/verificacion/sync', {
+              const response = await fetch(`${API_URL}/api/verificacion/sync`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ items: allItems, meta }) 
               });

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useClients } from "../../context/ClientContext";
 import { useToast } from "../../context/ToastContext";
+import { API_URL } from "../../config/api";
 
 // CONSTANTES DEL SISTEMA
 const BATCH_SIZE = 1500;
@@ -71,7 +72,7 @@ const AdminInventoryView = () => {
         target_label: clients.find(c => c.id === Number(selectedClient))?.nombre || 'N/A'
       }).toString();
 
-      const res = await fetch(`http://localhost:3000/api/inventario?${queryParams}`);
+      const res = await fetch(`${API_URL}/api/inventario?${queryParams}`);
       const data = await res.json();
 
       if (res.ok) setInventory(data.inventory);
@@ -110,7 +111,7 @@ const AdminInventoryView = () => {
   const deleteInventory = async () => {
     setDeleting(true);
     try {
-        const res = await fetch('http://localhost:3000/api/inventario', {
+        const res = await fetch(`${API_URL}/api/inventario`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -224,7 +225,7 @@ const AdminInventoryView = () => {
       numeroLote += 1;
 
       try {
-        const res = await fetch('http://localhost:3000/api/inventario/import', {
+        const res = await fetch(`${API_URL}/api/inventario/import`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

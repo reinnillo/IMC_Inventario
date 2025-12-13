@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Activity, UserCheck, Box, RefreshCw, Layers } from "lucide-react";
 import { useClients } from "../../context/ClientContext";
+import { API_URL } from "../../config/api";
 
 const CountingSupervision = () => {
   const { clients } = useClients();
@@ -20,7 +21,7 @@ const CountingSupervision = () => {
     if (!selectedClient) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/api/supervision/conteo?cliente_id=${selectedClient}`);
+      const res = await fetch(`${API_URL}/api/supervision/conteo?cliente_id=${selectedClient}`);
       const result = await res.json();
       if (res.ok) setData(result);
     } catch (err) { console.error(err); } 

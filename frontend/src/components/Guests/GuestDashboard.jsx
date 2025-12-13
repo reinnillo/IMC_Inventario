@@ -4,6 +4,7 @@ import {
   ShieldCheck, Activity, BarChart2, Clock, 
   AlertTriangle, CheckCircle, RefreshCw, Lock, Globe 
 } from "lucide-react";
+import { API_URL } from "../../config/api.js";
 
 // Estilos inline para asegurar aislamiento total
 const containerStyle = {
@@ -31,7 +32,7 @@ const GuestDashboard = ({ token }) => {
   // Auto-refresh
   const fetchGuestData = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/guest/access?token=${token}`);
+      const res = await fetch(`${API_URL}/api/guest/access?token=${token}`);
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Acceso denegado");
       setData(result);

@@ -5,6 +5,7 @@ import {
   Crown, Loader2, BarChart2 
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 // Componente de Métricas del Contador
 const CounterMetrics = () => {
@@ -15,7 +16,7 @@ const CounterMetrics = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/stats/contador/${user.id}`);
+        const res = await fetch(`${API_URL}/api/stats/contador/${user.id}`);
         const data = await res.json();
         if (res.ok) setMetrics(data.metrics);
       } catch (err) {

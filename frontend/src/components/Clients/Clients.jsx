@@ -9,6 +9,7 @@ import { useClients } from "../../context/ClientContext";
 import { useSystemUsers } from "../../context/SystemUsersContext";
 import { useToast } from "../../context/ToastContext"; 
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 const Clients = () => {
   const { clients, addClient } = useClients();
@@ -130,7 +131,7 @@ const Clients = () => {
         const fetchActiveLink = async () => {
             setInitialLoading(true);
             try {
-                const res = await fetch(`http://localhost:3000/api/guest/active-link?cliente_id=${showGuestModal.id}`);
+                const res = await fetch(`${API_URL}/api/guest/active-link?cliente_id=${showGuestModal.id}`);
                 const data = await res.json();
                 if (res.ok && data.link) {
                     setLinkData(data.link);
@@ -145,7 +146,7 @@ const Clients = () => {
     const generateLink = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3000/api/guest/create-link', {
+            const res = await fetch(`${API_URL}/api/guest/create-link`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -178,7 +179,7 @@ const Clients = () => {
         if(!window.confirm("¿Desactivar el acceso de invitado actual?")) return;
         
         try {
-            const res = await fetch('http://localhost:3000/api/guest/revoke-link', {
+            const res = await fetch(`${API_URL}/api/guest/revoke-link`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

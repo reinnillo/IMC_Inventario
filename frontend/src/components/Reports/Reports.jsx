@@ -7,6 +7,7 @@ import {
 import { useClients } from "../../context/ClientContext";
 import { useToast } from "../../context/ToastContext";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 // CONFIGURACIÓN DE REPORTES
 const PDF_ENDPOINTS = {
@@ -106,7 +107,7 @@ const Reports = () => {
             report_type: activeReport.title // Qué reporte (Metadata extra)
         }).toString();
 
-        const res = await fetch(`http://localhost:3000/api/reportes/${activeReport.endpoint}?${queryParams}`);
+        const res = await fetch(`${API_URL}/api/reportes/${activeReport.endpoint}?${queryParams}`);
         const result = await res.json();
 
         if (!res.ok) throw new Error(result.error);
@@ -145,7 +146,7 @@ const Reports = () => {
       // Seleccionamos el endpoint correcto usando el mapa
       const pdfEndpoint = PDF_ENDPOINTS[activeReport.endpoint] || 'varianza';
       
-      const response = await fetch(`http://localhost:3000/api/reportes/pdf/${pdfEndpoint}`, {
+      const response = await fetch(`${API_URL}/api/reportes/pdf/${pdfEndpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

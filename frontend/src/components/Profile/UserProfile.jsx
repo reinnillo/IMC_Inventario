@@ -4,6 +4,7 @@ import { User, Shield, Key, Save, Loader2, Phone, Mail, Hash, Briefcase, BarChar
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import GlobalProfile from "./GlobalProfile"; 
+import { API_URL } from "../../config/api";
 
 const UserProfile = () => {
   const { user, login } = useAuth(); 
@@ -32,7 +33,7 @@ const UserProfile = () => {
     }
     setIsSubmitting(true);
     try {
-        const res = await fetch('http://localhost:3000/api/auth/profile', {
+        const res = await fetch(`${API_URL}/api/auth/profile`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

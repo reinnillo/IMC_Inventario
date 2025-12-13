@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { db, resetCountingSession } from "../../db/db"; 
 import { useLiveQuery } from "dexie-react-hooks";
 import { useToast } from "../../context/ToastContext";
+import { API_URL } from "../../config/api";
 
 const BATCH_LIMIT_MAX = 800;
 const SYNC_CHUNK_SIZE = 500;
@@ -202,7 +203,7 @@ const CounterDashboard = () => {
                 fecha_fin_marbete: new Date(), es_recuento: false
             }));
 
-            const res = await fetch('http://localhost:3000/api/conteos/sync', {
+            const res = await fetch(`${API_URL}/api/conteos/sync`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: payload })
             });
 

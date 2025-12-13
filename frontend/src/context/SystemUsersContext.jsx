@@ -1,9 +1,8 @@
 // frontend/src/context/SystemUsersContext.jsx
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { API_URL } from "../config/api";
 
 const SystemUsersContext = createContext(null);
-
-const API_URL = "http://localhost:3000/api/usuarios_imc";
 
 export const SystemUsersProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
@@ -14,7 +13,7 @@ export const SystemUsersProvider = ({ children }) => {
   const refreshUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(`${API_URL}/api/usuarios_imc`);
       if (!res.ok) throw new Error("Fallo en enlace con Directorio");
       const data = await res.json();
       setUsers(data.users || []);
@@ -31,7 +30,7 @@ export const SystemUsersProvider = ({ children }) => {
   // 2. Crear Usuario
   const addUser = async (userData) => {
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(`${API_URL}/api/usuarios_imc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -55,7 +54,7 @@ export const SystemUsersProvider = ({ children }) => {
   // 4. Editar Usuario 
   const editUser = async (userId, updates) => {
     try {
-      const res = await fetch(`${API_URL}/${userId}`, {
+      const res = await fetch(`${API_URL}/api/usuarios_imc/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),

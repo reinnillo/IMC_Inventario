@@ -5,6 +5,7 @@ import {
   ShieldCheck, X 
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 const GlobalProfile = ({ onClose }) => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ const GlobalProfile = ({ onClose }) => {
   useEffect(() => {
     const fetchGlobalStats = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/stats/global/${user.id}`);
+        const res = await fetch(`${API_URL}/api/stats/global/${user.id}`);
         const data = await res.json();
         if (res.ok) setStats(data.profile);
       } catch (err) {

@@ -5,6 +5,7 @@ import {
   Target, BarChart, Loader2, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 // Componente de Métricas del Verificador
 const VerifierMetrics = () => {
@@ -15,7 +16,7 @@ const VerifierMetrics = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/stats/verificador/${user.id}`);
+        const res = await fetch(`${API_URL}/api/stats/verificador/${user.id}`);
         const data = await res.json();
         if (res.ok) setMetrics(data.metrics);
       } catch (err) {
