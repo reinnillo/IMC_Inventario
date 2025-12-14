@@ -349,13 +349,22 @@ const Clients = () => {
     const handleAssign = (userId) => {
       const targetUser = users.find(u => u.id === userId);
       const isTargetSupervisor = targetUser.role === 'supervisor' || targetUser.role === 'admin';
-      const hasSupervisor = assignedUsers.some(u => u.role === 'supervisor' || u.role === 'admin');
+      const currentSupervisor = assignedUsers.find(u => u.role === 'supervisor' || u.role === 'admin');
 
-      if (isTargetSupervisor && hasSupervisor) {
-        toast.warning("Acción denegada: Este cliente ya tiene un Supervisor asignado.");
-        return;
+      if (isTargetSupervisor && currentSupervisor) {
+        if (targetUser.id === currentSupervisor.id) return; // Same supervisor, do nothing.
+
+        // Replace the current supervisor
+        setPendingAssignments(prev => {
+          const newAssignments = prev.filter(id => id !== currentSupervisor.id);
+          newAssignments.push(targetUser.id);
+          return newAssignments;
+        });
+        toast.info(`Supervisor ${currentSupervisor.nombre} fue reemplazado por ${targetUser.nombre}.`);
+      } else {
+        // Just add the user if no supervisor conflict
+        setPendingAssignments(prev => [...prev, userId]);
       }
-      setPendingAssignments(prev => [...prev, userId]);
     };
 
     const handleRemove = (userId) => {
@@ -381,7 +390,7 @@ const Clients = () => {
                     <div><h2 className="team-manager-title">Gestión de Equipo</h2><p className="team-manager-subtitle">Asignando personal a: <strong>{selectedClient.nombre}</strong></p></div>
                     <button onClick={() => setSelectedClient(null)} className="modal-close-btn"><X size={24} /></button>
                 </div>
-                <div className="search-bar-container">
+                <div className="modal-search-bar-container">
                     <div className="search-bar-wrapper">
                         <Search size={18} className="search-icon" />
                         <input placeholder="Buscar empleado..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="search-input" />

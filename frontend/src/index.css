@@ -157,7 +157,7 @@ body {
 
   /* Ajustes de padding en móvil */
   .layout-content {
-    padding: 15px; /* Menos padding para ganar espacio */
+    padding: 0px; /* Menos padding para ganar espacio */
   }
 
   .top-bar {
@@ -283,7 +283,12 @@ body {
 /* ==========================================================================
    6. HOME & DASHBOARDS
    ========================================================================== */
-.home-container { display: flex; gap: 20px; height: 100%; }
+.home-container { 
+  display: flex; 
+  gap: 20px; 
+  height: 100%; 
+  padding: 16px;
+}
 
 .home-left {
   flex: 1;

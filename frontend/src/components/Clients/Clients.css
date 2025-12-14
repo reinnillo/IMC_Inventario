@@ -14,6 +14,22 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
+    position: sticky;
+    top: 0; /* Stick to the top of the scroll container's content area */
+    background: var(--bg);
+    z-index: 1;
+    
+    /* Compensate for the container's padding to make the header full-width */
+    margin-left: -25px;
+    margin-right: -25px;
+    padding-left: 25px;
+    padding-right: 25px;
+
+    /* Compensate for container's top padding to avoid the 'jump' */
+    margin-top: -25px;
+    padding-top: 25px; /* Add padding back to maintain header's inner layout */
+    
+    padding-bottom: 10px; /* Keep the space below */
 }
 
 .clients-header-title {
@@ -36,7 +52,7 @@
 }
 
 .new-client-btn {
-    width: auto;
+    width: 100%;
     background: #f59e0b;
     color: #000;
     cursor: pointer;
@@ -46,6 +62,7 @@
     font-weight: bold;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 
@@ -506,7 +523,7 @@
 .team-manager-modal-content {
     width: 90%;
     max-width: 900px;
-    height: 85vh; /* Use height instead of max-height for a consistent viewport experience */
+    max-height: 85vh; /* Use max-height for responsive adaptability */
     border: 1px solid var(--accent);
     box-shadow: 0 10px 40px rgba(0, 224, 255, 0.2);
 }
@@ -528,7 +545,7 @@
     color: white;
 }
 
-.search-bar-container {
+.modal-search-bar-container {
     padding: 15px;
     border-bottom: 1px solid var(--border);
     background: rgba(0,0,0,0.2);
@@ -667,6 +684,8 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 25px;
     }
 
     .form-grid {
@@ -693,7 +712,6 @@
     .user-list-container {
         border-right: none;
         border-bottom: 1px solid var(--border);
-        min-height: 250px; /* Ensure there's a minimum scroll area */
     }
 }
 
@@ -703,14 +721,11 @@
     }
 
     .modal-content, .guest-modal-content, .team-manager-modal-content {
-        width: 100%;
+        width: 85%;
         height: 100%;
-        max-height: 100vh;
-        border-radius: 0;
+        max-height: 85vh;
+        border-radius: 8px;
         border: none;
-    }
-    .modal-backdrop{
-        align-items: flex-end;
     }
 }
 

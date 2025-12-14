@@ -189,7 +189,7 @@ const Reports = () => {
    };
 
   return (
-    <div className="dashboard-container animate-fade-in">
+    <div className="dashboard-container animate-fade-in" style={{ padding: '16px' }}>
       {/* HEADER */}
       <div style={{ marginBottom: '30px', borderBottom: '1px solid var(--border)', paddingBottom: '20px' }}>
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent)', margin: 0 }}>
