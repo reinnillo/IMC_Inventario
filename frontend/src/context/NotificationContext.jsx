@@ -16,18 +16,18 @@ export const NotificationProvider = ({ children }) => {
   // 1. CARGA INICIAL (Con Debugging)
   useEffect(() => {
     const fetchRecentLogs = async () => {
-      console.log("🔍 Intentando obtener logs iniciales...");
+      //console.log("🔍 Intentando obtener logs iniciales...");
       try {
         const { data, error } = await supabase
             .from('audit_log')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(20);
+            .limit(10);
 
         if (error) {
             console.error("❌ Error Supabase al traer logs:", error.message);
         } else {
-            console.log(`✅ Logs recibidos: ${data.length}`, data); // <--- Mira esto en consola
+            //console.log(`✅ Logs recibidos: ${data.length}`, data); // <--- Mira esto en consola
             setNotifications(data);
             if(data.length > 0) lastProcessedIdRef.current = data[0].id;
         }
@@ -40,7 +40,7 @@ export const NotificationProvider = ({ children }) => {
 
   // 2. SUSCRIPCIÓN REALTIME (Con Debugging de Estado)
   useEffect(() => {
-    console.log("📡 Iniciando suscripción al canal audit_log_changes...");
+    //console.log("📡 Iniciando suscripción al canal audit_log_changes...");
     
     const channel = supabase
       .channel('audit_log_changes')
@@ -48,20 +48,20 @@ export const NotificationProvider = ({ children }) => {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'audit_log' },
         (payload) => {
-          console.log("🔔 EVENTO RECIBIDO REALTIME:", payload); // <--- Esto debe salir al crear algo
+          //console.log("🔔 EVENTO RECIBIDO REALTIME:", payload); // <--- Esto debe salir al crear algo
 
           if (!payload || !payload.new) return;
           const newLog = payload.new;
 
           // Anti-rebote
           if (lastProcessedIdRef.current === newLog.id) {
-              console.log("Ignorando duplicado:", newLog.id);
+              //console.log("Ignorando duplicado:", newLog.id);
               return;
           }
           lastProcessedIdRef.current = newLog.id;
 
           const action = String(newLog.action || '').toUpperCase();
-          // if (action.includes('READ')) return; // Comentado temporalmente para probar que SI llegan
+          if (action.includes('READ')) return; // Comentado temporalmente para probar que SI llegan
 
           setNotifications((prev) => {
               const updated = [newLog, ...prev];

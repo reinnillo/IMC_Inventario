@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(storedUser);
         // Validamos que al menos exista un rol para evitar estados zombies
         if (parsedUser && parsedUser.role) {
-            console.log("🔋 Sesión restaurada desde disco:", parsedUser);
+            //console.log("🔋 Sesión restaurada desde disco:", parsedUser);
             setUser(parsedUser);
         } else {
             localStorage.removeItem(STORAGE_KEY);
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       last_login: new Date().toISOString()
     };
 
-    console.log("🔐 Guardando Nueva Sesión:", sessionData);
+    //console.log("🔐 Guardando Nueva Sesión:", sessionData);
     setUser(sessionData);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
   };
