@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { 
   Building2, Plus, Phone, Mail, Users, Crown, Shield, UserMinus, UserPlus, 
   X, Search, Save, MapPin, Briefcase, FileText, Loader2, AlertTriangle, ArrowRightCircle,
-  Share2, Copy, RefreshCw, Trash2, Check
+  Share2, Copy, RefreshCw, Trash2, Check, Pencil
 } from "lucide-react";
 import { useClients } from "../../context/ClientContext";
 import { useSystemUsers } from "../../context/SystemUsersContext";
@@ -12,7 +12,7 @@ import { API_URL } from "../../config/api";
 import "./Clients.css";
 
 const Clients = () => {
-  const { clients, addClient } = useClients();
+  const { clients, addClient, updateClient } = useClients();
   const { users, assignUserToClient } = useSystemUsers();
   const { user } = useAuth();
   const toast = useToast(); 
@@ -20,9 +20,10 @@ const Clients = () => {
   const [selectedClient, setSelectedClient] = useState(null); 
   const [showCreateModal, setShowCreateModal] = useState(false); 
   const [showGuestModal, setShowGuestModal] = useState(null); 
+  const [showEditModal, setShowEditModal] = useState(null);
 
   useEffect(() => {
-    const isModalOpen = selectedClient || showGuestModal || showCreateModal;
+    const isModalOpen = selectedClient || showGuestModal || showCreateModal || showEditModal;
     if (isModalOpen) {
       document.body.classList.add('modal-open');
     } else {
@@ -32,7 +33,7 @@ const Clients = () => {
     return () => {
       document.body.classList.remove('modal-open');
     };
-  }, [selectedClient, showGuestModal, showCreateModal]);
+  }, [selectedClient, showGuestModal, showCreateModal, showEditModal]);
 
   const clientMap = useMemo(() => {
     return clients.reduce((acc, client) => {
@@ -117,6 +118,98 @@ const Clients = () => {
                             <button type="button" onClick={() => setShowCreateModal(false)} className="btn-cancel">Cancelar</button>
                             <button type="submit" disabled={isSubmitting} className="btn-submit">
                                 {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Registrar Cliente
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+  };
+
+  // --- SUB-COMPONENTE: MODAL EDITAR CLIENTE ---
+  const EditClientModal = ({ client }) => {
+    const [formData, setFormData] = useState({
+        nombre: client.nombre || "", 
+        nombre_comercial: client.nombre_comercial || "", 
+        ruc: client.ruc || "", 
+        telefono: client.telefono || "", 
+        email: client.email || "",
+        direccion: client.direccion || "", 
+        contacto_principal: client.contacto_principal || "", 
+        telefono_contacto: client.telefono_contacto || "", 
+        notas: client.notas || ""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (errorMsg) setErrorMsg(null); 
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrorMsg(null);
+
+        const result = await updateClient(client.id, formData);
+        
+        if (result.success) {
+            toast.success(`Cliente "${formData.nombre}" actualizado exitosamente.`); 
+            setShowEditModal(null);
+        } else {
+            setErrorMsg(result.message || "Error al actualizar cliente."); 
+        }
+        setIsSubmitting(false);
+    };
+
+    return (
+        <div className="modal-backdrop">
+            <div className={`modal-content ${errorMsg ? 'modal-content-error' : ''}`}>
+                <div className="modal-header">
+                    <div>
+                        <h2 className="modal-title"><Pencil /> Editar Entidad Corporativa</h2>
+                        <p className="modal-subtitle">Actualizando la ficha de: <strong>{client.nombre}</strong></p>
+                    </div>
+                    <button onClick={() => setShowEditModal(null)} className="modal-close-btn"><X size={24} /></button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="modal-form">
+                    <div>
+                        <h4 className="form-section-title"><Briefcase size={16} color="#f59e0b" /> Identidad</h4>
+                        <div className="form-grid">
+                            <div><label className="form-label">Razón Social (Legal) *</label><input name="nombre" value={formData.nombre} onChange={handleChange} required className="form-input" /></div>
+                            <div><label className="form-label">Nombre Comercial</label><input name="nombre_comercial" value={formData.nombre_comercial} onChange={handleChange} className="form-input" /></div>
+                            <div><label className="form-label">RUC / ID Fiscal</label><input name="ruc" value={formData.ruc} onChange={handleChange} className="form-input" /></div>
+                            <div><label className="form-label">Correo Corporativo</label><input name="email" type="email" value={formData.email} onChange={handleChange} className="form-input" /></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="form-section-title"><MapPin size={16} color="#f59e0b" /> Ubicación</h4>
+                        <div className="form-grid">
+                            <div className="form-grid-full"><label className="form-label">Dirección Física</label><input name="direccion" value={formData.direccion} onChange={handleChange} className="form-input" /></div>
+                            <div><label className="form-label">Contacto Principal</label><input name="contacto_principal" value={formData.contacto_principal} onChange={handleChange} className="form-input" /></div>
+                            <div><label className="form-label">Teléfono</label><input name="telefono" value={formData.telefono} onChange={handleChange} className="form-input" /></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="form-section-title"><FileText size={16} color="#f59e0b" /> Notas</h4>
+                        <textarea name="notas" value={formData.notas} onChange={handleChange} className="form-input form-textarea" />
+                    </div>
+
+                    <div className="modal-footer">
+                        {errorMsg && (
+                            <div className="error-message">
+                                <AlertTriangle size={18} />
+                                <span>{errorMsg}</span>
+                            </div>
+                        )}
+
+                        <div className="modal-actions">
+                            <button type="button" onClick={() => setShowEditModal(null)} className="btn-cancel">Cancelar</button>
+                            <button type="submit" disabled={isSubmitting} className="btn-submit">
+                                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Guardar Cambios
                             </button>
                         </div>
                     </div>
@@ -377,6 +470,11 @@ const Clients = () => {
             <button onClick={() => setSelectedClient(client)} className="btn-team">
                 <Users size={16} /> Equipo
             </button>
+            {user && (user.role === 'admin' || user.role === 'supervisor') && (
+              <button onClick={() => setShowEditModal(client)} className="btn-edit" title="Editar Cliente">
+                  <Pencil size={16} />
+              </button>
+            )}
             <button onClick={() => setShowGuestModal(client)} className="btn-guest-access" title="Acceso Invitado">
                 <Share2 size={16} />
             </button>
@@ -527,6 +625,7 @@ const Clients = () => {
       {selectedClient && <TeamManagerModal />}
       {showGuestModal && <GuestAccessModal />}
       {showCreateModal && <CreateClientModal />}
+      {showEditModal && <EditClientModal client={showEditModal} />}
     </div>
   );
 };

@@ -571,6 +571,21 @@
     gap: 8px;
 }
 
+.btn-edit {
+    flex: 1;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid #f59e0b;
+    color: #f59e0b;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
 .btn-delete-client {
     flex: 1;
     background: rgba(239, 68, 68, 0.1);

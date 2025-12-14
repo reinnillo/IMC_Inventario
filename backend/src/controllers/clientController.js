@@ -70,6 +70,57 @@ export const createClient = async (req, res) => {
     }
 };
 
+// PUT: Actualizar información de un cliente
+export const updateClient = async (req, res) => {
+  const { id } = req.params;
+  const {
+    nombre, nombre_comercial, ruc, telefono, email,
+    direccion, contacto_principal, telefono_contacto, notas
+  } = req.body;
+
+  // Validación mínima
+  if (!nombre) {
+    return res.status(400).json({ error: 'El nombre del cliente es obligatorio.' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('clientes')
+      .update({
+        nombre,
+        nombre_comercial,
+        ruc,
+        telefono,
+        email,
+        direccion,
+        contacto_principal,
+        telefono_contacto,
+        notas,
+        fecha_actualizado: new Date()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      // Manejo de duplicados (si RUC fuera unique por ejemplo)
+      if (error.code === '23505') return res.status(409).json({ error: 'Cliente con ese RUC ya existe.' });
+      throw error;
+    }
+
+    if (!data) return res.status(404).json({ error: 'Cliente no encontrado.' });
+
+    return res.status(200).json({
+      message: 'Información del cliente actualizada.',
+      client: data
+    });
+
+  } catch (err) {
+    console.error('Error Client Update:', err.message);
+    return res.status(500).json({ error: 'Error al actualizar la información del cliente.' });
+  }
+};
+
 // PATCH: Cambiar el estado de un cliente
 export const updateClientStatus = async (req, res) => {
   const { id } = req.params;

@@ -115,6 +115,35 @@ export const ClientProvider = ({ children }) => {
     }
   };
 
+  // 5. Actualizar Cliente
+  const updateClient = async (clientId, clientData) => {
+    if (!user || !['admin', 'supervisor'].includes(user.role)) {
+      return { success: false, message: "No autorizado." };
+    }
+
+    try {
+      const res = await fetch(`${URL}/${clientId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...clientData,
+          user_role: user.role
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || "Error al actualizar el cliente");
+      }
+
+      await refreshClients();
+      return { success: true, message: result.message };
+
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  };
+
   // Métricas
   const metrics = useMemo(() => {
     return {
@@ -133,7 +162,8 @@ export const ClientProvider = ({ children }) => {
     refreshClients,
     addClient,
     updateClientStatus,
-    deleteClient
+    deleteClient,
+    updateClient
   };
 
   return (
