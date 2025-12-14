@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { API_URL } from "../config/api";
 
+import { useAuth } from "./AuthContext";
+
 const ClientContext = createContext(null);
 
 const URL = `${API_URL}/api/clientes`;
@@ -10,6 +12,7 @@ export const ClientProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth(); // Depend on AuthContext
 
   // 1. Obtener Clientes
   const refreshClients = async () => {
@@ -32,7 +35,7 @@ export const ClientProvider = ({ children }) => {
     refreshClients();
   }, []);
 
-  // 2. Crear Cliente (NUEVO)
+  // 2. Crear Cliente
   const addClient = async (clientData) => {
     try {
       const res = await fetch(URL, {
@@ -44,9 +47,69 @@ export const ClientProvider = ({ children }) => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Error al crear cliente");
 
-      // Recargamos la lista para garantizar consistencia (IDs, fechas, etc.)
       await refreshClients(); 
       return { success: true };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  };
+
+  // 3. Actualizar Estado de Cliente (Refactored)
+  const updateClientStatus = async (clientId, estado) => {
+    if (!user || !user.role) {
+      return { success: false, message: "Usuario no autenticado o rol no disponible." };
+    }
+
+    try {
+      const res = await fetch(`${URL}/${clientId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          estado: estado,
+          user_role: user.role // Get role from AuthContext
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || "Error al actualizar el estado");
+      }
+
+      // Optimistic update locally before refreshing
+      setClients(prevClients => 
+        prevClients.map(c => c.id === clientId ? { ...c, estado: estado } : c)
+      );
+
+      return { success: true, message: result.message };
+
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  };
+
+  // 4. Eliminar Cliente
+  const deleteClient = async (clientId) => {
+    if (!user || !['admin', 'supervisor'].includes(user.role)) {
+      return { success: false, message: "No autorizado." };
+    }
+  
+    try {
+      const res = await fetch(`${URL}/${clientId}`, {
+        method: "DELETE",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user_role: user.role })
+      });
+  
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || "Error al eliminar el cliente");
+      }
+  
+      setClients(prevClients => prevClients.filter(c => c.id !== clientId));
+      return { success: true, message: result.message };
+  
     } catch (err) {
       return { success: false, message: err.message };
     }
@@ -68,7 +131,9 @@ export const ClientProvider = ({ children }) => {
     loading,
     error,
     refreshClients,
-    addClient // Exportamos la nueva función
+    addClient,
+    updateClientStatus,
+    deleteClient
   };
 
   return (

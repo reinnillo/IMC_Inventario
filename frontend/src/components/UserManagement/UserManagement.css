@@ -34,18 +34,20 @@
 }
 
 .add-user-btn {
-  width: auto;
-  background: var(--accent);
+  width: 25%;
+  background: var(--accent2);
   color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center; /* Center content for mobile view */
   gap: 8px;
-  padding: 10px 15px;
+  padding: 15px; /* Larger padding for mobile */
   border-radius: 8px;
   border: none;
   font-weight: bold;
-  transition: background-color 0.2s;
+  font-size: 1.1rem;
+  transition: background-color 0.2s, width 0.2s;
 }
 .add-user-btn:hover {
   background: var(--accent-hover);
@@ -385,5 +387,14 @@
 
   .form-selectors-container {
     flex-direction: column; /* Apilar los selectores de rol y contrato */
+  }
+}
+
+/* Regla para tabletas y desktops */
+@media (min-width: 768px) {
+  .add-user-btn {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 0.9rem;
   }
 }

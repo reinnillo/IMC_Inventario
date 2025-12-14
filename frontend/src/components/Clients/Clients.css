@@ -52,7 +52,6 @@
 }
 
 .new-client-btn {
-    width: 100%;
     background: #f59e0b;
     color: #000;
     cursor: pointer;
@@ -64,6 +63,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
 }
 
 /* Modal General Styles */
@@ -401,6 +401,58 @@
     border: 1px solid #ef4444;
 }
 
+.client-card-status-suspended {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+}
+
+/* --- NUEVOS ESTILOS PARA EL SELECT --- */
+.client-card-status-select {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 0.65em auto;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.client-card-status-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+.client-card-status-select.client-card-status-activo {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.client-card-status-select.client-card-status-inactivo {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+.client-card-status-select.client-card-status-suspendido {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+}
+
+.client-card-status-select option {
+    background: var(--card);
+    color: var(--fg);
+    font-weight: bold;
+}
+/* --- FIN DE NUEVOS ESTILOS --- */
+
 .supervisor-avatar {
     width: 45px;
     height: 45px;
@@ -517,6 +569,21 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+}
+
+.btn-delete-client {
+    flex: 1;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
 }
 
 /* Team Manager Modal */
@@ -686,6 +753,10 @@
         gap: 15px;
         border-bottom: 1px solid var(--border);
         padding-bottom: 25px;
+    }
+
+    .new-client-btn {
+        width: 100%;
     }
 
     .form-grid {

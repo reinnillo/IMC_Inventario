@@ -66,6 +66,5 @@ app.get('/health', (req, res) => {
 // ================= INICIO =================
 console.log("🔗 Conectando a Supabase en:", process.env.SUPABASE_URL);
 app.listen(PORT, () => {
-  console.log(`🚀 IMC Backend operativo en puerto :${PORT}`);
   console.log(`📡 Rutas activas: Auth, Usuarios, Clientes, Conteos, Verificación.`);
 });

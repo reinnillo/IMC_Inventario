@@ -282,17 +282,77 @@ const Clients = () => {
 
   // --- SUB-COMPONENTE: CARD DE CLIENTE ---
   const ClientCard = ({ client }) => {
+    const { user } = useAuth();
+    const { updateClientStatus, deleteClient } = useClients(); // Añadir deleteClient
+    const toast = useToast();
+    const [isUpdating, setIsUpdating] = useState(false);
+
     const assignedTeam = users.filter(u => u.cliente_id === client.id && u.activo);
     const supervisors = assignedTeam.filter(u => u.role === 'supervisor' || u.role === 'admin');
     const staff = assignedTeam.filter(u => u.role !== 'supervisor' && u.role !== 'admin');
     const mainSupervisor = supervisors[0];
+
+    const canEditStatus = user && (user.role === 'admin' || user.role === 'supervisor');
+
+    const getStatusClass = (status) => {
+      const statusMap = {
+        activo: 'client-card-status-active',
+        inactivo: 'client-card-status-inactive',
+        suspendido: 'client-card-status-suspended',
+      };
+      return statusMap[status] || 'client-card-status-inactive';
+    };
+
+    const handleStatusChange = async (e) => {
+      const newStatus = e.target.value;
+      if (newStatus === client.estado) return;
+
+      setIsUpdating(true);
+      const result = await updateClientStatus(client.id, newStatus);
+      if (result.success) {
+        toast.success(`Estado de ${client.nombre} actualizado.`);
+      } else {
+        toast.error(`Error: ${result.message}`);
+      }
+      setIsUpdating(false);
+    };
+
+    const handleDelete = (client) => {
+      toast.prompt(
+        'Confirmar Eliminación',
+        `¿Estás seguro de que quieres eliminar a "${client.nombre}"? Esta acción no se puede deshacer.`,
+        async () => { 
+          const result = await deleteClient(client.id);
+          if (result.success) {
+            toast.success(result.message);
+          } else {
+            toast.error(result.message);
+          }
+        },
+        'danger'
+      );
+    };
 
     return (
       <div className="client-card">
         <div className="client-card-header">
             <div>
                 <h3 className="client-card-title">{client.nombre}</h3>
-                <span className={`client-card-status ${client.estado === 'activo' ? 'client-card-status-active' : 'client-card-status-inactive'}`}>{client.estado?.toUpperCase()}</span>
+                {isUpdating ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : canEditStatus ? (
+                  <select 
+                    value={client.estado} 
+                    onChange={handleStatusChange}
+                    className={`client-card-status-select client-card-status-${client.estado}`}
+                  >
+                    <option value="activo">ACTIVO</option>
+                    <option value="inactivo">INACTIVO</option>
+                    <option value="suspendido">SUSPENDIDO</option>
+                  </select>
+                ) : (
+                  <span className={`client-card-status ${getStatusClass(client.estado)}`}>{client.estado?.toUpperCase()}</span>
+                )}
             </div>
             {mainSupervisor ? (
                 <div title={`Supervisor: ${mainSupervisor.nombre}`} className="supervisor-avatar supervisor-avatar-assigned">{mainSupervisor.nombre.charAt(0)}</div>
@@ -320,6 +380,11 @@ const Clients = () => {
             <button onClick={() => setShowGuestModal(client)} className="btn-guest-access" title="Acceso Invitado">
                 <Share2 size={16} />
             </button>
+            {user && (user.role === 'admin' || user.role === 'supervisor') && (
+              <button onClick={() => handleDelete(client)} className="btn-delete-client" title="Eliminar Cliente">
+                  <Trash2 size={16} />
+              </button>
+            )}
         </div>
       </div>
     );
@@ -383,6 +448,7 @@ const Clients = () => {
       setIsSaving(false);
     };
 
+    // Render del modal: asignación de usuarios
     return (
         <div className="modal-backdrop">
             <div className="modal-content team-manager-modal-content">
@@ -448,6 +514,7 @@ const Clients = () => {
     );
   };
 
+  // --- COMPONENTE PRINCIPAL: CLIENTES ---
   return (
     <div className="clients-container animate-fade-in">
       <div className="clients-header">
