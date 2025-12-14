@@ -46,12 +46,7 @@ export const SystemUsersProvider = ({ children }) => {
     }
   };
 
-  // 3. Asignar Cliente 
-  const assignUserToClient = async (userId, clientId) => {
-    return editUser(userId, { cliente_id: clientId });
-  };
-
-  // 4. Editar Usuario 
+  // 3. Editar Usuario 
   const editUser = async (userId, updates) => {
     try {
       const res = await fetch(`${API_URL}/api/usuarios_imc/${userId}`, {
@@ -70,6 +65,26 @@ export const SystemUsersProvider = ({ children }) => {
     }
   };
 
+  // 4. Asignación en Lote
+  const assignUsersToClientBatch = async (clientId, userIds) => {
+    try {
+      const res = await fetch(`${API_URL}/api/usuarios_imc/assign-batch`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId, userIds }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+
+      // Refrescar toda la data para consistencia
+      await refreshUsers(); 
+      return { success: true, message: result.message };
+
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  };
+
   // Selectores
   const staffFijo = useMemo(() => users.filter(u => u.user_type === 'Fijo'), [users]);
   const staffTemporal = useMemo(() => users.filter(u => u.user_type !== 'Fijo'), [users]);
@@ -83,7 +98,7 @@ export const SystemUsersProvider = ({ children }) => {
     refreshUsers,
     addUser,
     editUser, // Exportamos la función genérica
-    assignUserToClient
+    assignUsersToClientBatch, // Exportamos la nueva función
   };
 
   return (

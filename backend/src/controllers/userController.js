@@ -63,10 +63,16 @@ export const createUser = async (req, res) => {
   }
 };
 
-// PUT: Actualizar Usuario (Para Asignación de Cliente)
+// PUT: Actualizar Datos de Usuario
 export const updateUser = async (req, res) => {
   const { id } = req.params;
-  const updates = req.body; // Esperamos { cliente_id: 123 } o { cliente_id: null }
+  const updates = req.body;
+
+  // Medida de seguridad: Prohibir la modificación de 'cliente_id' a través de este endpoint.
+  // La asignación de clientes solo debe realizarse a través de la ruta de lote /assign-batch.
+  if (updates.cliente_id !== undefined) {
+    delete updates.cliente_id;
+  }
 
   try {
     const { data, error } = await supabase
@@ -78,9 +84,49 @@ export const updateUser = async (req, res) => {
 
     if (error) throw error;
 
+    if (!data) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
     return res.status(200).json({ message: 'Usuario actualizado.', user: data });
   } catch (err) {
     console.error('Error SDK (PUT):', err.message);
     return res.status(500).json({ error: 'Fallo al actualizar usuario.' });
+  }
+};
+
+// PUT: Actualización en Lote de Asignaciones de Cliente
+export const updateUserAssignments = async (req, res) => {
+  const { clientId, userIds } = req.body;
+
+  if (clientId === undefined || !Array.isArray(userIds)) {
+    return res.status(400).json({ error: 'Protocolo incompleto: Se requiere clientId y un array userIds.' });
+  }
+
+  try {
+    // PASO 1: Limpiar todas las asignaciones existentes para este cliente.
+    // Esto simplifica la lógica y previene errores con filtros complejos.
+    const { error: unassignError } = await supabase
+      .from('usuarios_imc')
+      .update({ cliente_id: null })
+      .eq('cliente_id', clientId);
+
+    if (unassignError) throw { ...unassignError, step: 'unassign-all' };
+
+    // PASO 2: Asignar el nuevo conjunto de usuarios. Si el array está vacío, no hace nada.
+    if (userIds.length > 0) {
+      const { error: assignError } = await supabase
+        .from('usuarios_imc')
+        .update({ cliente_id: clientId })
+        .in('id', userIds);
+      
+      if (assignError) throw { ...assignError, step: 'assign-new-set' };
+    }
+
+    return res.status(200).json({ message: `Equipo del cliente actualizado correctamente.` });
+
+  } catch (err) {
+    console.error(`Error SDK (Batch Assign) en paso "${err.step || 'unknown'}":`, err.message);
+    return res.status(500).json({ error: `Fallo al actualizar las asignaciones del equipo (paso: ${err.step}).` });
   }
 };

@@ -1,0 +1,389 @@
+/* frontend/src/components/UserManagement/UserManagement.css */
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.user-management-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 15px;
+  flex-wrap: wrap; /* Para responsividad */
+  gap: 15px; /* Espacio si se envuelve */
+}
+
+.header-title-group .header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+  margin: 0;
+}
+
+.header-title-group .header-subtitle {
+  color: #8b949e;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.add-user-btn {
+  width: auto;
+  background: var(--accent);
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+.add-user-btn:hover {
+  background: var(--accent-hover);
+}
+
+
+/* --- GRID Y ESTADOS DE CARGA --- */
+.user-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.centered-feedback {
+  text-align: center;
+  padding: 50px;
+}
+.centered-feedback.loading { color: var(--accent); }
+
+.centered-feedback-icon {
+  margin-bottom: 15px;
+}
+
+.error-feedback {
+  color: #ef4444;
+  padding: 20px;
+  border: 1px solid #ef4444;
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* Rejilla de tarjetas de usuario */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* --- TARJETA DE USUARIO (UserCard) --- */
+.user-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.user-card:hover {
+  border-color: #8b949e; /* Usando un color genérico para hover */
+}
+.user-card.inactive {
+  opacity: 0.7;
+}
+
+.user-card-status-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--role-color, #f59e0b); /* Color por defecto */
+}
+.user-card.inactive .user-card-status-stripe {
+  background-color: #ef4444;
+}
+
+.user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+.user-card-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.user-card-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--role-color-20, rgba(245, 158, 11, 0.1)), var(--role-color-10, rgba(245, 158, 11, 0.05)));
+  border: 1px solid var(--role-color-40, rgba(245, 158, 11, 0.25));
+  color: var(--role-color, #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.user-card-name {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--fg);
+}
+.user-card-role-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--role-color-20, rgba(245, 158, 11, 0.1));
+  color: var(--role-color, #f59e0b);
+  border: 1px solid var(--role-color-40, rgba(245, 158, 11, 0.25));
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.user-card-edit-btn {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.user-card-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail-item .detail-label {
+  color: var(--accent);
+  margin-left: auto;
+  font-size: 0.7rem;
+}
+.detail-item .detail-label.free {
+  color: #6b7280;
+}
+
+.user-card-footer {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status-text {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-text.active { color: var(--success); }
+.status-text.inactive { color: #ef4444; }
+.user-id-text {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+
+/* --- MODAL UNIVERSAL --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+.modal-content {
+  background: var(--card);
+  width: 500px; /* Ancho por defecto */
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--accent);
+}
+.modal-content.editing {
+  border-color: #a855f7;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+}
+.modal-title {
+  margin: 0;
+  color: var(--accent);
+}
+.modal-content.editing .modal-title {
+  color: #a855f7;
+}
+.modal-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+/* Formulario del Modal */
+.modal-form {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+  overflow-y: auto;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.form-group-full {
+  grid-column: span 2;
+}
+.form-label {
+  display: block;
+  color: #8b949e;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--fg);
+  outline: none;
+  box-sizing: border-box; /* Añadido para consistencia */
+}
+.form-select {
+  cursor: pointer;
+}
+.password-note {
+  color: #8b949e;
+  font-weight: normal;
+}
+.form-selectors-container {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.selector-group {
+  flex: 1;
+}
+.selector-group .form-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.active-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+.active-toggle-container.active {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--success);
+}
+.active-toggle-container.inactive {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+}
+.active-toggle-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.active-toggle-label {
+  cursor: pointer;
+  font-weight: bold;
+}
+.active-toggle-label.active { color: var(--success); }
+.active-toggle-label.inactive { color: #ef4444; }
+
+
+.form-button-group {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+.pda-btn-secondary {
+ flex: 1;
+ /* Asumo que tienes estilos globales para esto, si no, habría que definirlos */
+}
+.pda-btn-primary {
+  flex: 2;
+  color: #000;
+  background: var(--accent);
+}
+.modal-content.editing .pda-btn-primary {
+  background: #a855f7;
+}
+
+
+/* --- REGLAS DE RESPONSIVIDAD --- */
+@media (max-width: 600px) {
+  .modal-content {
+    width: 95vw; /* Modal casi completo en ancho */
+    height: 90vh; /* Y alto, por si el teclado aparece */
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr; /* Formulario a una sola columna */
+  }
+
+  .form-group-full {
+    grid-column: span 1; /* Resetear el span en móvil */
+  }
+
+  .form-selectors-container {
+    flex-direction: column; /* Apilar los selectores de rol y contrato */
+  }
+}
