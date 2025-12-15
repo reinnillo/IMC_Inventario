@@ -627,36 +627,3 @@ body {
 /* ==========================================================================
    11. CUSTOM SCROLLBARS (WEBKIT) - GLOBAL
    ========================================================================== */
-
-/* Barra total */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-/* Fondo de la barra */
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-/* El deslizador (Thumb) */
-::-webkit-scrollbar-thumb {
-  background: #30363d; /* Color gris oscuro acorde al tema */
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.2); /* Borde para dar sensación de flotar */
-}
-
-/* Hover del deslizador */
-::-webkit-scrollbar-thumb:hover {
-  background: #8b949e;
-}
-
-/* Scrollbar invisible para contenedores específicos si se desea clase .no-scroll */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
