@@ -1,8 +1,20 @@
 // frontend/src/components/Supervision/CountingSupervision.jsx
 import React, { useState, useEffect } from "react";
 import { Activity, UserCheck, Box, RefreshCw, Layers } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useClients } from "../../context/ClientContext";
 import { API_URL } from "../../config/api";
+
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip" style={{ background: 'var(--card-alt)', padding: '5px 10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+          <p className="label">{`${label} : ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+};
 
 const CountingSupervision = () => {
   const { clients } = useClients();
@@ -29,7 +41,6 @@ const CountingSupervision = () => {
   };
 
   const styles = `
-    /* LAYOUT BASE (DESKTOP) */
     .supervision-layout { 
         display: grid; 
         grid-template-columns: 2fr 1fr; 
@@ -74,36 +85,36 @@ const CountingSupervision = () => {
         gap: 20px; 
         overflow-y: auto; 
         height: 100%; 
+        padding-bottom: 10px;
     }
     
     .data-table { width: 100%; border-collapse: collapse; fontSize: 0.9rem; }
     .data-table th { background: var(--bg); position: sticky; top: 0; padding: 12px 10px; text-align: left; color: #8b949e; z-index: 5; border-bottom: 1px solid var(--border); }
     .data-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     
-    /* MOBILE & TABLET (FIX: FLUID STACK) */
     @media (max-width: 1024px) {
       .supervision-layout { 
-          display: flex;          /* Cambiamos Grid por Flex Vertical */
+          display: flex;
           flex-direction: column; 
-          overflow-y: auto;       /* Scroll en todo el contenedor */
-          height: auto;           /* Altura libre */
+          overflow-y: auto;
+          height: auto;
           min-height: 100%;
           padding-right: 5px;
       }
       
       .left-col {
-          overflow: visible;      /* Permitir que crezca */
+          overflow: visible;
           height: auto;
-          flex: none;             /* Anular flex-grow */
+          flex: none;
       }
 
       .kpi-grid { 
-          grid-template-columns: repeat(2, 1fr); /* 2 Columnas para mejor visibilidad */
+          grid-template-columns: repeat(2, 1fr);
           margin-bottom: 20px;
       }
       
       .feed-panel { 
-          min-height: 400px;      /* Altura fija segura para la tabla */
+          min-height: 400px;
           flex: none;
       }
       
@@ -115,7 +126,11 @@ const CountingSupervision = () => {
     }
 
     @media (max-width: 480px) {
-      .kpi-grid { grid-template-columns: 1fr; } /* 1 Columna en móviles pequeños */
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+    .recharts-text {
+        fill: #8b949e;
+        font-size: 0.8rem;
     }
   `;
 
@@ -142,7 +157,6 @@ const CountingSupervision = () => {
       ) : (
         <div className="supervision-layout">
             
-            {/* COLUMNA IZQUIERDA WRAPPER */}
             <div className="left-col">
                 <div className="kpi-grid">
                     <div className="stat-card"><small style={{color:'#8b949e'}}>TOTAL PIEZAS</small><div style={{fontSize:'1.5rem', fontWeight:'bold', color:'var(--fg)'}}>{data.stats.totalPiezas.toLocaleString()}</div></div>
@@ -178,11 +192,19 @@ const CountingSupervision = () => {
                 </div>
             </div>
 
-            {/* COLUMNA DERECHA */}
             <div className="right-col">
                 <div style={{background:'var(--card)', borderRadius:'12px', border:'1px solid var(--border)', padding:'15px', flexShrink: 0}}>
                     <h4 style={{margin:'0 0 15px 0', color:'#10b981', display:'flex', alignItems:'center', gap:'8px'}}><UserCheck size={18}/> Productividad</h4>
-                    <div style={{display:'flex', flexDirection:'column', gap:'10px', maxHeight: '300px', overflowY: 'auto'}}>
+                    <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={data.activeCounters} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="nombre" />
+                            <YAxis />
+                            <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(255,255,255,0.05)'}}/>
+                            <Bar dataKey="qty" fill="#10b981" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                    <div style={{display:'flex', flexDirection:'column', gap:'10px', maxHeight: '200px', overflowY: 'auto', marginTop:'15px', borderTop:'1px solid var(--border)', paddingTop:'10px'}}>
                         {data.activeCounters.map((c, i) => (
                             <div key={i} style={{display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:'0.9rem', padding:'8px', background:'rgba(255,255,255,0.02)', borderRadius:'6px'}}>
                                 <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
@@ -196,7 +218,16 @@ const CountingSupervision = () => {
                 </div>
                 <div style={{background:'var(--card)', borderRadius:'12px', border:'1px solid var(--border)', padding:'15px', flex: 1, display: 'flex', flexDirection: 'column'}}>
                     <h4 style={{margin:'0 0 15px 0', color:'#f59e0b', display:'flex', alignItems:'center', gap:'8px', flexShrink: 0}}><Layers size={18}/> Marbetes Top</h4>
-                    <div style={{display:'flex', flexDirection:'column', gap:'8px', overflowY: 'auto', flex: 1}}>
+                     <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={data.activeMarbetes} margin={{ top: 5, right: 20, left: -20, bottom: 40 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="marbete" interval={0} angle={-45} textAnchor="end" />
+                            <YAxis />
+                            <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(255,255,255,0.05)'}}/>
+                            <Bar dataKey="qty" fill="#f59e0b" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                    <div style={{display:'flex', flexDirection:'column', gap:'8px', overflowY: 'auto', flex: 1, marginTop:'15px', borderTop:'1px solid var(--border)', paddingTop:'10px'}}>
                         {data.activeMarbetes.map((m, i) => (
                             <div key={i} style={{display:'flex', justifyContent:'space-between', fontSize:'0.85rem', borderBottom:'1px dashed rgba(255,255,255,0.1)', paddingBottom:'5px'}}>
                                 <span>{m.marbete}</span>

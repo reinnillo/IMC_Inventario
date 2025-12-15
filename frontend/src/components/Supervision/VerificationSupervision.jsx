@@ -1,8 +1,22 @@
 // frontend/src/components/Supervision/VerificationSupervision.jsx
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, CheckCircle, RefreshCw, Search } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useClients } from "../../context/ClientContext";
 import { API_URL } from "../../config/api";
+
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip" style={{ background: 'var(--card-alt)', padding: '5px 10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+          <p className="label" style={{fontWeight:'bold', margin: '0 0 5px 0'}}>{label}</p>
+          <p className="intro" style={{color: '#10b981', margin:0}}>{`Correctos: ${payload.find(p => p.dataKey === 'count')?.value || 0}`}</p>
+          <p className="intro" style={{color: '#ef4444', margin:0}}>{`Errores: ${payload.find(p => p.dataKey === 'errorsFound')?.value || 0}`}</p>
+        </div>
+      );
+    }
+    return null;
+};
 
 const VerificationSupervision = () => {
   const { clients } = useClients();
@@ -75,7 +89,6 @@ const VerificationSupervision = () => {
     .data-table th { background: var(--bg); position: sticky; top: 0; padding: 12px 10px; text-align: left; color: #8b949e; z-index: 5; border-bottom: 1px solid var(--border); }
     .data-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    /* FLUID STACK FOR MOBILE */
     @media (max-width: 1024px) {
         .supervision-layout { 
             display: flex;
@@ -97,12 +110,19 @@ const VerificationSupervision = () => {
         }
         
         .feed-panel { 
-            min-height: 400px; /* Altura segura para tabla */
+            min-height: 400px;
             flex: none;
         }
     }
     @media (max-width: 480px) {
         .kpi-grid { grid-template-columns: 1fr; }
+    }
+    .recharts-text {
+        fill: #8b949e;
+        font-size: 0.8rem;
+    }
+    .recharts-legend-item-text {
+        color: #8b949e !important;
     }
   `;
 
@@ -172,14 +192,27 @@ const VerificationSupervision = () => {
                 <div style={{padding:'15px', borderBottom:'1px solid var(--border)', flexShrink: 0}}>
                     <h4 style={{margin:0, color:'var(--success)', display:'flex', alignItems:'center', gap:'8px'}}><CheckCircle size={18}/> Auditores Activos</h4>
                 </div>
-                <div style={{overflowY:'auto', flex:1, padding:'15px'}}>
+                <div style={{padding: '15px 15px 0 15px'}}>
+                    <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={data.activeVerifiers} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="nombre" />
+                            <YAxis />
+                            <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(255,255,255,0.05)'}}/>
+                            <Legend />
+                            <Bar name="Correctos" dataKey="count" stackId="a" fill="#10b981" />
+                            <Bar name="Errores" dataKey="errorsFound" stackId="a" fill="#ef4444" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                <div style={{overflowY:'auto', flex:1, padding:'15px', marginTop:'15px', borderTop:'1px solid var(--border)'}}>
                     <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
                         {data.activeVerifiers.map((v, i) => (
-                            <div key={i} style={{padding:'12px', background:'rgba(255,255,255,0.02)', borderRadius:'8px', border:'1px solid transparent'}}>
+                            <div key={i} style={{padding:'12px', background:'rgba(255,255,255,0.02)', borderRadius:'8px', border:'1px solid var(--border)'}}>
                                 <div style={{fontWeight:'bold', marginBottom:'5px', fontSize:'0.9rem'}}>{v.nombre}</div>
                                 <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.8rem'}}>
-                                    <span style={{color:'#8b949e'}}>OK: <strong>{v.count}</strong></span>
-                                    <span style={{color: v.errorsFound > 0 ? '#ef4444' : '#10b981'}}>Err: <strong>{v.errorsFound}</strong></span>
+                                    <span style={{color:'#8b949e'}}>OK: <strong style={{color:'var(--fg)'}}>{v.count}</strong></span>
+                                    <span style={{color: v.errorsFound > 0 ? '#ef4444' : '#8b949e'}}>Err: <strong style={{color: v.errorsFound > 0 ? '#ef4444' : 'var(--fg)'}}>{v.errorsFound}</strong></span>
                                 </div>
                             </div>
                         ))}
