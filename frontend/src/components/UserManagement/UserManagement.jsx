@@ -78,9 +78,9 @@ const UserManagement = () => {
   // --- SUB-COMPONENT: USER CARD ---
   const UserCard = ({ u }) => {
     const isInactive = !u.activo;
-    const roleColor = u.role === 'admin' ? 'var(--accent)' : 
-                      u.role === 'supervisor' ? '#a855f7' : 
-                      u.role === 'verificador' ? 'var(--success)' : '#f59e0b';
+    const roleColor = u.role === 'admin' ? '#a955f7c0' : 
+                      u.role === 'supervisor' ?  'var(--accent)' : 
+                      u.role === 'verificador' ? 'var(--success)' : '#f59f0bd7';
     
     // Para pasar colores con transparencia a CSS variables
     const roleColor_20 = roleColor + '33'; // Aproximación para 20%
@@ -235,7 +235,7 @@ const UserManagement = () => {
                       <select name="role" value={formData.role} onChange={handleChange} className="form-select">
                         <option value="contador">CONTADOR</option>
                         <option value="verificador">VERIFICADOR</option>
-                        <option value="supervisor">SUPERVISOR</option>
+                        {userRole === 'admin' && <option value="supervisor">SUPERVISOR</option>}
                         {userRole === 'admin' && <option value="admin">ADMIN</option>}
                       </select>
                   </div>
