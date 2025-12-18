@@ -84,6 +84,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  perspective: 1000px; /* For 3D hover effect */
 }
 
 /* --- TARJETA DE USUARIO (UserCard) --- */
@@ -129,15 +130,17 @@
 .user-card-avatar {
   width: 45px;
   height: 45px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--role-color-20, rgba(245, 158, 11, 0.1)), var(--role-color-10, rgba(245, 158, 11, 0.05)));
-  border: 1px solid var(--role-color-40, rgba(245, 158, 11, 0.25));
+  /* Visual changes below */
+  background: transparent;
+  border: none;
   color: var(--role-color, #f59e0b);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 1.2rem;
+}
+
+.user-card-avatar svg {
+  fill: var(--role-color-20);
 }
 .user-card-name {
   margin: 0;
@@ -397,4 +400,64 @@
     padding: 10px 15px;
     font-size: 0.9rem;
   }
+}
+
+/* --- ESTILOS ESPECIALES PARA TARJETA DE ADMIN --- */
+
+@keyframes adminShimmer {
+  0% {
+    transform: translateX(-100%) skewX(-25deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-25deg);
+  }
+}
+
+.user-card.admin-card {
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.user-card.admin-card:hover {
+  transform: rotateY(10deg) rotateX(5deg) scale(1.05);
+  box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.5);
+}
+
+.user-card.admin-card:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, rgba(255, 215, 0, 0.2) 50%, transparent 100%);
+  pointer-events: none;
+  animation: adminShimmer 6s infinite linear;
+}
+
+.user-card.admin-card .user-card-name {
+  color: #F0E68C; /* Khaki */
+}
+
+.user-card.admin-card .user-card-role-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: #f1a54d; /* Dark brown for contrast */
+    border-color: rgba(212, 175, 55, 0.5);
+    font-weight: 600;
+}
+
+.user-card.admin-card .user-card-avatar {
+    background: transparent;
+    border-color: transparent;
+    color: #F0E68C;
+}
+
+/* --- ESTILOS SUTILES PARA SUPERVISOR --- */
+.user-card.supervisor-card {
+  background-color: rgba(39, 154, 241, 0.1); /* Increased opacity */
 }

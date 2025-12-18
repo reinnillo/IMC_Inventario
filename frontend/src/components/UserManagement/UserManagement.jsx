@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { 
   Users, Plus, X, Loader2, Save, Database, Power, PowerOff, 
-  Edit2, Phone, Mail, Hash, Shield, Briefcase, AlertTriangle
+  Edit2, Phone, Mail, Hash, Shield, Briefcase, AlertTriangle, User, UserCog
 } from "lucide-react";
 import { useSystemUsers } from "../../context/SystemUsersContext"; 
 import { useToast } from "../../context/ToastContext";
@@ -78,18 +78,22 @@ const UserManagement = () => {
   // --- SUB-COMPONENT: USER CARD ---
   const UserCard = ({ u }) => {
     const isInactive = !u.activo;
-    const roleColor = u.role === 'admin' ? '#a955f7c0' : 
-                      u.role === 'supervisor' ?  'var(--accent)' : 
-                      u.role === 'verificador' ? 'var(--success)' : '#f59f0bd7';
+    // Definición de colores vivos por rol
+    const roleColor = u.role === 'admin' ? '#D4AF37' :           // Gold
+                      u.role === 'supervisor' ? '#279AF1' :       // Vivid Blue
+                      u.role === 'verificador' ? '#4CAF50' :      // Vivid Green
+                      '#F44336';                                  // Vivid Red (for contador)
     
     // Para pasar colores con transparencia a CSS variables
-    const roleColor_20 = roleColor + '33'; // Aproximación para 20%
-    const roleColor_10 = roleColor + '1A'; // Aproximación para 10%
-    const roleColor_40 = roleColor + '66'; // Aproximación para 40%
+    const roleColor_20 = roleColor + '33';
+    const roleColor_10 = roleColor + '1A';
+    const roleColor_40 = roleColor + '66';
+
+    const cardClassName = `user-card ${isInactive ? 'inactive' : ''} ${u.role === 'admin' ? 'admin-card' : ''} ${u.role === 'supervisor' ? 'supervisor-card' : ''}`;
 
     return (
       <div 
-        className={`user-card ${isInactive ? 'inactive' : ''}`}
+        className={cardClassName}
         style={{
           '--role-color': roleColor,
           '--role-color-10': roleColor_10,
@@ -102,7 +106,7 @@ const UserManagement = () => {
         <div className="user-card-header">
             <div className="user-card-info">
                 <div className="user-card-avatar">
-                    {u.nombre.charAt(0)}
+                    {u.role === 'admin' ? <UserCog size={22} /> : <User size={22} />}
                 </div>
                 <div>
                     <h3 className="user-card-name">{u.nombre}</h3>
@@ -111,9 +115,13 @@ const UserManagement = () => {
                     </span>
                 </div>
             </div>
-            <button onClick={() => openEditModal(u)} className="user-card-edit-btn" title="Editar Perfil">
-                <Edit2 size={18} />
-            </button>
+
+            {/* El botón de editar no se muestra para el rol de admin */}
+            {u.role !== 'admin' && (
+              <button onClick={() => openEditModal(u)} className="user-card-edit-btn" title="Editar Perfil">
+                  <Edit2 size={18} />
+              </button>
+            )}
         </div>
 
         <div className="user-card-details-grid">
@@ -128,10 +136,12 @@ const UserManagement = () => {
             </div>
             <div className="detail-item">
                 <Briefcase size={14} /> {u.user_type.toUpperCase()}
-                {u.cliente_id 
-                    ? <span className="detail-label">ASIGNADO</span> 
-                    : <span className="detail-label free">LIBRE</span>
-                }
+                {/* Los admins no se asignan, no mostrar estado de asignación */}
+                {u.role !== 'admin' && (
+                  u.cliente_id 
+                      ? <span className="detail-label">ASIGNADO</span> 
+                      : <span className="detail-label free">LIBRE</span>
+                )}
             </div>
         </div>
 
