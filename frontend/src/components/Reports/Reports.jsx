@@ -61,6 +61,17 @@ const REPORTS_CONFIG = [
     defaultCols: ["metrica", "valor"],
     optionalCols: [],
     hasPdf: true // Activado
+  },
+  {
+    id: "conteos",
+    title: "Productos Contados",
+    desc: "Descarga detallada de registros de la tabla conteos_part.",
+    icon: CheckSquare,
+    color: "#8b5cf6",
+    endpoint: "conteos",
+    defaultCols: ["codigo_producto", "cantidad", "ubicacion", "marbete", "nombre_contador", "fecha_escaneo"],
+    optionalCols: ["area", "estado", "es_recuento", "verificado", "device_id", "tiempo_tomado", "batch_id", "fecha_sincronizado"],
+    hasPdf: false
   }
 ];
 

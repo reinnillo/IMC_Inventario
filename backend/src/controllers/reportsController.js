@@ -248,3 +248,28 @@ export const getValuationReport = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+/**
+ * REPORTE 5: PRODUCTOS CONTADOS (RAW DATA)
+ */
+export const getCountedProductsReport = async (req, res) => {
+  const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
+  if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
+
+  // AUDITORÍA
+  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'COUNTED_PRODUCTS');
+
+  try {
+    const { data, error } = await supabase
+      .from('conteos_part')
+      .select('*')
+      .eq('cliente_id', cliente_id)
+      .order('fecha_escaneo', { ascending: false });
+
+    if (error) throw error;
+
+    return res.json({ data });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};

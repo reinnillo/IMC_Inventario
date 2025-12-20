@@ -4,7 +4,8 @@ import {
     getVariationsReport, 
     getUncountedCodesReport, 
     getUncountedLocationsReport, 
-    getValuationReport 
+    getValuationReport,
+    getCountedProductsReport
 } from '../controllers/reportsController.js';
 
 const router = express.Router();
@@ -13,5 +14,6 @@ router.get('/reportes/variaciones', getVariationsReport);
 router.get('/reportes/no-contados', getUncountedCodesReport);
 router.get('/reportes/ubicaciones-pendientes', getUncountedLocationsReport);
 router.get('/reportes/valoracion', getValuationReport);
+router.get('/reportes/conteos', getCountedProductsReport);
 
 export default router;
