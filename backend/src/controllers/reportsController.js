@@ -41,7 +41,7 @@ const enrichWithMasterData = async (items, cliente_id) => {
 };
 
 // HELPER: AUDITORÍA GENÉRICA
-const logReportAudit = async (admin_id, admin_name, admin_role, cliente_id, cliente_name, report_type) => {
+const logReportAudit = async (req, admin_id, admin_name, admin_role, cliente_id, cliente_name, report_type) => {
   if(admin_id || cliente_id) {
     await logAudit({
       admin_id,
@@ -64,10 +64,10 @@ export const getVariationsReport = async (req, res) => {
   const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
   if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
 
-  // AUDITORÍA
-  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'VARIATIONS');
-
   try {
+    // AUDITORÍA
+    await logReportAudit(req, admin_id, admin_name, admin_role, cliente_id, cliente_name, 'VARIATIONS');
+
     // PASO 1: Obtener datos de VERIFICACIÓN (Solo columnas que existen en esta tabla)
     const { data: verificados, error } = await supabase
       .from('inventario_verificado_part')
@@ -95,10 +95,10 @@ export const getUncountedCodesReport = async (req, res) => {
   const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
   if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
 
-  // AUDITORÍA
-  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'UNCOUNTED_CODES');
-
   try {
+    // AUDITORÍA
+    await logReportAudit(req, admin_id, admin_name, admin_role, cliente_id, cliente_name, 'UNCOUNTED_CODES');
+
     // 1. Obtener lista de códigos YA verificados
     const { data: verificados } = await supabase
       .from('inventario_verificado_part')
@@ -132,10 +132,10 @@ export const getUncountedLocationsReport = async (req, res) => {
   const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
   if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
 
-  // AUDITORÍA
-  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'UNCOUNTED_LOCATIONS');
-
   try {
+    // AUDITORÍA
+    await logReportAudit(req, admin_id, admin_name, admin_role, cliente_id, cliente_name, 'UNCOUNTED_LOCATIONS');
+
     // 1. Obtener productos verificados para inferir ubicaciones tocadas
     // Estrategia: Si un producto fue contado, asumimos que su ubicación teórica fue visitada.
     const { data: verificados } = await supabase
@@ -182,10 +182,10 @@ export const getValuationReport = async (req, res) => {
   const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
   if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
   
-  // AUDITORÍA
-  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'VALUATION');
-
   try {
+    // AUDITORÍA
+    await logReportAudit(req, admin_id, admin_name, admin_role, cliente_id, cliente_name, 'VALUATION');
+
     // 1. Obtener datos básicos de verificación (Sin costo)
     const { data: verificados, error } = await supabase
       .from('inventario_verificado_part')
@@ -256,10 +256,10 @@ export const getCountedProductsReport = async (req, res) => {
   const { admin_id, admin_name, admin_role, cliente_id, cliente_name } = req.query;
   if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido' });
 
-  // AUDITORÍA
-  await logReportAudit(admin_id, admin_name, admin_role, cliente_id, cliente_name, 'COUNTED_PRODUCTS');
-
   try {
+    // AUDITORÍA
+    await logReportAudit(req, admin_id, admin_name, admin_role, cliente_id, cliente_name, 'COUNTED_PRODUCTS');
+
     const { data, error } = await supabase
       .from('conteos_part')
       .select('*')
