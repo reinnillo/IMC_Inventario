@@ -14,7 +14,8 @@ const PDF_ENDPOINTS = {
     'variaciones': 'varianza',
     'no-contados': 'no-contados',
     'ubicaciones-pendientes': 'ubicaciones-pendientes',
-    'valoracion': 'valoracion'
+    'valoracion': 'valoracion',
+    'conteos': 'productos-contados'
 };
 
 const REPORTS_CONFIG = [
@@ -69,9 +70,9 @@ const REPORTS_CONFIG = [
     icon: CheckSquare,
     color: "#8b5cf6",
     endpoint: "conteos",
-    defaultCols: ["codigo_producto", "cantidad", "ubicacion", "marbete", "nombre_contador", "fecha_escaneo"],
-    optionalCols: ["area", "estado", "es_recuento", "verificado", "device_id", "tiempo_tomado", "batch_id", "fecha_sincronizado"],
-    hasPdf: false
+    defaultCols: ["codigo_producto", "descripcion", "categoria", "area", "ubicacion", "cantidad"],
+    optionalCols: ["marbete", "nombre_contador", "fecha_escaneo"],
+    hasPdf: true
   }
 ];
 

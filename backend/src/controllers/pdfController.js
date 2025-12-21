@@ -39,8 +39,8 @@ const drawHeader = (doc, title, clientData, stats = []) => {
        .text(valStr, boxX + pad, ry, { width: boxW - (pad*2), align: 'right' });
   };
 
-  row('Cliente', clientData.nombre, boxY + 12, true);
-  row('Ubicación', clientData.direccion || 'N/A', boxY + 30);
+  row('Cliente', clientData.nombre || '-', boxY + 12, true);
+  row('Ubicación', clientData.direccion || '-', boxY + 30);
   
   if (stats[0]) row(stats[0].label, stats[0].value, boxY + 48);
 
@@ -119,7 +119,7 @@ export const generateVarianceReport = async (req, res) => {
       .eq('cliente_id', cliente_id).neq('diferencia', 0).order('diferencia', { ascending: true });
 
     let tTeorico = 0, tContado = 0, tDif = 0;
-    verificados.forEach(i => {
+    (verificados || []).forEach(i => {
       tTeorico += Number(i.cantidad_sistema) || 0;
       tContado += Number(i.cantidad_final) || 0;
       tDif += (Number(i.cantidad_final) || 0) - (Number(i.cantidad_sistema) || 0);
@@ -151,21 +151,21 @@ export const generateVarianceReport = async (req, res) => {
 
     y = printHeader(y);
 
-    verificados.forEach((item, i) => {
+    (verificados || []).forEach((item, i) => {
       if (y > 750) { doc.addPage(); y = 50; y = printHeader(y); }
       const dif = (Number(item.cantidad_final)||0) - (Number(item.cantidad_sistema)||0);
       
       drawTableRow(doc, y, [
-        { text: item.codigo_producto, x: cols[0].x, w: cols[0].w },
-        { text: item.descripcion || '', x: cols[1].x, w: cols[1].w },
-        { text: item.cantidad_sistema, x: cols[2].x, w: cols[2].w, align: 'center' },
-        { text: item.cantidad_final, x: cols[3].x, w: cols[3].w, align: 'center' },
+        { text: item.codigo_producto || '-', x: cols[0].x, w: cols[0].w },
+        { text: item.descripcion || '-', x: cols[1].x, w: cols[1].w },
+        { text: Number(item.cantidad_sistema) || 0, x: cols[2].x, w: cols[2].w, align: 'center' },
+        { text: Number(item.cantidad_final) || 0, x: cols[3].x, w: cols[3].w, align: 'center' },
         { text: dif > 0 ? `+${dif}` : dif, x: cols[4].x, w: cols[4].w, align: 'center', color: dif < 0 ? COLORS.red : COLORS.green, font: 'Helvetica-Bold' }
       ], false, i % 2 === 0 ? COLORS.accent : null);
       y += 18;
     });
 
-    if (verificados.length === 0) {
+    if (!verificados || verificados.length === 0) {
         doc.font('Helvetica-Oblique').fontSize(10).fillColor(COLORS.secondary)
            .text('Sin variaciones registradas.', MARGIN, y + 10, { align: 'center', width: PAGE_WIDTH - (MARGIN*2) });
     }
@@ -185,12 +185,12 @@ export const generateUncountedReport = async (req, res) => {
     
     // Obtener verificados
     const { data: verificados } = await supabase.from('inventario_verificado_part').select('codigo_producto').eq('cliente_id', cliente_id);
-    const setVerif = new Set(verificados.map(v => v.codigo_producto));
+    const setVerif = new Set((verificados || []).map(v => v.codigo_producto));
 
     // Obtener sistema (sin límite para PDF completo)
     const { data: sistema } = await supabase.from('inventarios_cliente_part').select('codigo_producto, descripcion, cantidad, area').eq('id_cliente', cliente_id);
     
-    const noContados = sistema.filter(i => !setVerif.has(i.codigo_producto));
+    const noContados = (sistema || []).filter(i => !setVerif.has(i.codigo_producto));
     const totalPendiente = noContados.reduce((acc, i) => acc + (Number(i.cantidad)||0), 0);
 
     const doc = new PDFDocument({ margin: MARGIN, size: 'A4', bufferPages: true });
@@ -220,10 +220,10 @@ export const generateUncountedReport = async (req, res) => {
     noContados.forEach((item, i) => {
       if (y > 750) { doc.addPage(); y = 50; y = printHeader(y); }
       drawTableRow(doc, y, [
-        { text: item.codigo_producto, x: cols[0].x, w: cols[0].w },
-        { text: item.descripcion || '', x: cols[1].x, w: cols[1].w },
+        { text: item.codigo_producto || '-', x: cols[0].x, w: cols[0].w },
+        { text: item.descripcion || '-', x: cols[1].x, w: cols[1].w },
         { text: item.area || '-', x: cols[2].x, w: cols[2].w, align: 'center' },
-        { text: item.cantidad, x: cols[3].x, w: cols[3].w, align: 'center', font: 'Helvetica-Bold' }
+        { text: Number(item.cantidad) || 0, x: cols[3].x, w: cols[3].w, align: 'center', font: 'Helvetica-Bold' }
       ], false, i % 2 === 0 ? COLORS.accent : null);
       y += 18;
     });
@@ -248,12 +248,12 @@ export const generateLocationsReport = async (req, res) => {
     
     // Lógica simplificada de ubicaciones
     const { data: verificados } = await supabase.from('inventario_verificado_part').select('codigo_producto').eq('cliente_id', cliente_id);
-    const setVerif = new Set(verificados.map(v => v.codigo_producto));
+    const setVerif = new Set((verificados || []).map(v => v.codigo_producto));
     
     const { data: sistema } = await supabase.from('inventarios_cliente_part').select('codigo_producto, ubicacion, area').eq('id_cliente', cliente_id);
     
     const locMap = new Map();
-    sistema.forEach(i => {
+    (sistema || []).forEach(i => {
       if (!setVerif.has(i.codigo_producto) && i.ubicacion) {
         if (!locMap.has(i.ubicacion)) locMap.set(i.ubicacion, { ubicacion: i.ubicacion, area: i.area, items: 0 });
         locMap.get(i.ubicacion).items++;
@@ -288,10 +288,10 @@ export const generateLocationsReport = async (req, res) => {
     pendientes.forEach((item, i) => {
       if (y > 750) { doc.addPage(); y = 50; y = printHeader(y); }
       drawTableRow(doc, y, [
-        { text: item.ubicacion, x: cols[0].x, w: cols[0].w, font: 'Helvetica-Bold' },
+        { text: item.ubicacion || '-', x: cols[0].x, w: cols[0].w, font: 'Helvetica-Bold' },
         { text: item.area || 'General', x: cols[1].x, w: cols[1].w },
         { text: 'Sin Actividad', x: cols[2].x, w: cols[2].w, align: 'center', color: COLORS.red },
-        { text: item.items, x: cols[3].x, w: cols[3].w, align: 'center' }
+        { text: item.items || 0, x: cols[3].x, w: cols[3].w, align: 'center' }
       ], false, i % 2 === 0 ? COLORS.accent : null);
       y += 18;
     });
@@ -317,7 +317,7 @@ export const generateValuationReport = async (req, res) => {
 
     // Calcular KPIs
     let totalFis = 0, totalSys = 0, totalAbsDiff = 0, itemsError = 0;
-    verificados.forEach(i => {
+    (verificados || []).forEach(i => {
         const f = Number(i.cantidad_final)||0;
         const s = Number(i.cantidad_sistema)||0;
         const d = f - s;
@@ -325,7 +325,7 @@ export const generateValuationReport = async (req, res) => {
         if(d !== 0) itemsError++;
     });
     
-    const accuracySKU = verificados.length > 0 ? ((verificados.length - itemsError) / verificados.length) * 100 : 0;
+    const accuracySKU = (verificados || []).length > 0 ? (((verificados || []).length - itemsError) / (verificados || []).length) * 100 : 0;
     const accuracyUnits = totalSys > 0 ? (1 - (totalAbsDiff / totalSys)) * 100 : 0;
 
     const doc = new PDFDocument({ margin: MARGIN, size: 'A4', bufferPages: true });
@@ -342,7 +342,7 @@ export const generateValuationReport = async (req, res) => {
     const kpis = [
         { label: 'Precisión Global (Accuracy SKU)', value: `${accuracySKU.toFixed(2)}%` },
         { label: 'Precisión Global (Accuracy Unidades)', value: `${accuracyUnits.toFixed(2)}%` },
-        { label: 'Total SKUs Auditados', value: verificados.length },
+        { label: 'Total SKUs Auditados', value: (verificados || []).length },
         { label: 'Unidades Físicas (Total)', value: totalFis },
         { label: 'Unidades Sistema (Total)', value: totalSys },
         { label: 'Variación Neta (Unidades)', value: totalFis - totalSys, isDiff: true },
@@ -371,6 +371,94 @@ export const generateValuationReport = async (req, res) => {
            
         y += 30;
     });
+
+    drawFooter(doc);
+    doc.end();
+  } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
+};
+
+// 5. PRODUCTOS CONTADOS
+export const generateProductosContadosPDF = async (req, res) => {
+  const { cliente_id } = req.body;
+  if (!cliente_id) return res.status(400).json({ error: 'Cliente ID requerido.' });
+
+  try {
+    const { data: cliente } = await supabase.from('clientes').select('nombre, direccion').eq('id', cliente_id).single();
+
+    // 1. Obtener todos los conteos para el cliente
+    const { data: conteos, error: conteosError } = await supabase
+      .from('conteos_part')
+      .select('codigo_producto, cantidad, ubicacion, area, marbete, nombre_contador, fecha_escaneo')
+      .eq('cliente_id', cliente_id);
+
+    if (conteosError) throw conteosError;
+
+    // 2. Obtener la información de los productos (descripción, categoría)
+    const codigos = [...new Set((conteos || []).map(c => c.codigo_producto))];
+    const { data: productos, error: productosError } = await supabase
+      .from('inventarios_cliente_part')
+      .select('codigo_producto, descripcion, categoria')
+      .eq('id_cliente', cliente_id)
+      .in('codigo_producto', codigos);
+
+    if (productosError) throw productosError;
+
+    // 3. Crear un mapa para búsqueda rápida de info de producto
+    const productosMap = new Map((productos || []).map(p => [p.codigo_producto, p]));
+
+    // 4. Unir los datos
+    const reportData = (conteos || []).map(conteo => ({
+      ...conteo,
+      descripcion: productosMap.get(conteo.codigo_producto)?.descripcion || '-',
+      categoria: productosMap.get(conteo.codigo_producto)?.categoria || '-',
+    }));
+      
+    const totalContados = reportData.reduce((acc, i) => acc + (Number(i.cantidad) || 0), 0);
+
+    const doc = new PDFDocument({ margin: MARGIN, size: 'A4', bufferPages: true });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Reporte_Productos_Contados.pdf"`);
+    doc.pipe(res);
+
+    let y = drawHeader(doc, 'Reporte de Productos Contados', cliente || {}, [
+      { label: 'SKUs Contados', value: reportData.length },
+      { label: 'Unidades Totales', value: totalContados, color: COLORS.blue }
+    ]);
+
+    const cols = [
+      { x: 40, w: 75, title: 'CÓDIGO' },
+      { x: 121, w: 160, title: 'DESCRIPCIÓN' },
+      { x: 287, w: 70, title: 'CATEGORÍA' },
+      { x: 363, w: 70, title: 'ÁREA' },
+      { x: 439, w: 70, title: 'UBICACIÓN' },
+      { x: 515, w: 40, title: 'CANT', align: 'right' }
+    ];
+
+    const printHeader = (cy) => {
+      drawTableRow(doc, cy, cols.map(c => ({ text: c.title, x: c.x, w: c.w, align: c.align })), true);
+      return cy + 20;
+    };
+
+    y = printHeader(y);
+
+    reportData.forEach((item, i) => {
+      if (y > 750) { doc.addPage(); y = 50; y = printHeader(y); }
+      
+      drawTableRow(doc, y, [
+        { text: item.codigo_producto || '-', x: cols[0].x, w: cols[0].w },
+        { text: item.descripcion || '-', x: cols[1].x, w: cols[1].w },
+        { text: item.categoria || '-', x: cols[2].x, w: cols[2].w },
+        { text: item.area || '-', x: cols[3].x, w: cols[3].w },
+        { text: item.ubicacion || '-', x: cols[4].x, w: cols[4].w },
+        { text: Number(item.cantidad) || 0, x: cols[5].x, w: cols[5].w, align: 'right', font: 'Helvetica-Bold' }
+      ], false, i % 2 === 0 ? COLORS.accent : null);
+      y += 18;
+    });
+
+    if (reportData.length === 0) {
+        doc.font('Helvetica-Oblique').fontSize(10).fillColor(COLORS.secondary)
+           .text('No se han registrado conteos para este cliente.', MARGIN, y + 10, { align: 'center', width: PAGE_WIDTH - (MARGIN*2) });
+    }
 
     drawFooter(doc);
     doc.end();
